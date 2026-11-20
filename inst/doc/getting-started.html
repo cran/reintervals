@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Getting started with reintervals</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Getting started with reintervals</h1>
+
+
+
+<p><code>reintervals</code> computes four kinds of interval for a linear
+mixed model fitted with <code>lme4::lmer()</code>, through one uniform
+interface, and returns them in one tidy <code>lmm_interval</code> data
+frame.</p>
+<div id="the-four-interval-types-and-when-to-use-each" class="section level2">
+<h2>1. The four interval types — and when to use each</h2>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Verb</th>
+<th>Answers</th>
+<th>Use when you want…</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ci_lmm()</code></td>
+<td>confidence interval for the <strong>mean</strong></td>
+<td>uncertainty in the average response at a point</td>
+</tr>
+<tr class="even">
+<td><code>pi_lmm()</code></td>
+<td>prediction interval for <strong>one future observation</strong></td>
+<td>where a single new measurement will fall</td>
+</tr>
+<tr class="odd">
+<td><code>ti_lmm()</code></td>
+<td>tolerance interval covering a proportion <code>P</code> of the
+<strong>population</strong></td>
+<td>a content/coverage statement (e.g. “99% of units, 95%
+confident”)</td>
+</tr>
+<tr class="even">
+<td><code>new_group_mean_lmm()</code></td>
+<td>the <strong>CInew / new-batch-mean</strong> interval</td>
+<td>where the mean of one new, unobserved group/batch will fall</td>
+</tr>
+</tbody>
+</table>
+<p><code>lmm_predict(model, interval = ...)</code> is a
+<code>predict()</code>-style wrapper over the four. The engine that
+computes each interval is chosen automatically from the fitted model;
+<code>method =</code> can override it only within the engines allowed
+for that model’s design (Section 4).</p>
+</div>
+<div id="the-four-verbs-on-a-random-intercept-model" class="section level2">
+<h2>2. The four verbs on a random-intercept model</h2>
+<p>We use <code>sleepstudy</code> (reaction time by <code>Days</code>,
+random intercept per <code>Subject</code>):</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>fm <span class="ot">&lt;-</span> lme4<span class="sc">::</span><span class="fu">lmer</span>(Reaction <span class="sc">~</span> Days <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> Subject), <span class="at">data =</span> lme4<span class="sc">::</span>sleepstudy)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">ci_lmm</span>(fm, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">Days =</span> <span class="dv">5</span>))</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#&gt; &lt;lmm_interval&gt; ci  (method = ems-mls, design = random_intercept_fixed_slope)</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co">#&gt;  Days type estimate    lower    upper level  P     sides singular boundary vg_floored</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt;     5   ci 303.7415 284.6347 322.8483  0.95 NA two.sided    FALSE       NA         NA</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt; diagnostics: df, df_method  (see attr(., &quot;diagnostics&quot;))</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="fu">pi_lmm</span>(fm, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">Days =</span> <span class="dv">5</span>))</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; &lt;lmm_interval&gt; pi  (method = ems-mls, design = random_intercept_fixed_slope)</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt;  Days type estimate    lower    upper level  P     sides singular boundary vg_floored</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt;     5   pi 303.7415 204.3995 403.0835  0.95 NA two.sided    FALSE       NA         NA</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt; diagnostics: df, df_method  (see attr(., &quot;diagnostics&quot;))</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="fu">ti_lmm</span>(fm, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">Days =</span> <span class="dv">5</span>), <span class="at">P =</span> <span class="fl">0.99</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co">#&gt; &lt;lmm_interval&gt; ti  (method = ems-mls, design = random_intercept_fixed_slope)</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt;  Days type estimate    lower    upper level    P     sides singular boundary vg_floored</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co">#&gt;     5   ti 303.7415 142.9097 464.5734  0.95 0.99 two.sided    FALSE       NA         NA</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="fu">new_group_mean_lmm</span>(fm, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">Days =</span> <span class="dv">5</span>))</span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co">#&gt; &lt;lmm_interval&gt; new_group_mean  (method = anova-mls, design = random_intercept_fixed_slope)</span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co">#&gt;  Days           type estimate   lower   upper level  P     sides singular boundary</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co">#&gt;     5 new_group_mean 303.7415 220.511 386.972  0.95 NA two.sided    FALSE       NA</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co">#&gt;  vg_floored</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#&gt;          NA</span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co">#&gt; diagnostics: df, df_rule, W  (see attr(., &quot;diagnostics&quot;))</span></span></code></pre></div>
+<div id="reading-the-output" class="section level3">
+<h3>Reading the output</h3>
+<p>Every verb returns the same <code>lmm_interval</code> columns:</p>
+<ul>
+<li>the <strong>eval-point column(s)</strong>, named by the actual
+predictor (<code>Days</code> here);</li>
+<li><code>type</code>
+(<code>ci</code>/<code>pi</code>/<code>ti</code>/<code>new_group_mean</code>),
+<code>estimate</code>, <code>lower</code>, <code>upper</code>;</li>
+<li><code>level</code> (the confidence, <code>1 - alpha</code>) and
+<code>P</code> (content proportion — a value for <code>ti</code>,
+<code>NA</code> for the coverage intervals); <code>sides</code>;</li>
+<li><code>method</code> (the engine that ran) and <code>design</code>
+(the route-independent model class);</li>
+<li>the per-row flags <code>singular</code>, <code>boundary</code>,
+<code>vg_floored</code>.</li>
+</ul>
+<p>Engine-specific extras (degrees of freedom, GPQ/ANOVA intermediates)
+live in an attribute, and the random-intercept topology in another:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>ci <span class="ot">&lt;-</span> <span class="fu">ci_lmm</span>(fm, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">Days =</span> <span class="dv">5</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">str</span>(<span class="fu">attr</span>(ci, <span class="st">&quot;diagnostics&quot;</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt; List of 2</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt;  $ df       : num 17.1</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt;  $ df_method: chr &quot;satterthwaite&quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">attr</span>(ci, <span class="st">&quot;grouping&quot;</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;oneway&quot;</span></span></code></pre></div>
+</div>
+</div>
+<div id="stability-worked-examples-that-double-as-validation" class="section level2">
+<h2>3. Stability worked examples that double as validation</h2>
+<p>The next two examples are <strong>not illustrations</strong> — they
+are the package reproducing its published validation oracles, live.</p>
+<div id="montes-burdick-leblond-2019-appendix-a" class="section level3">
+<h3>Montes-Burdick-Leblond (2019) Appendix A</h3>
+<p><code>mbl_appendix_a</code> is the committed Appendix A dataset (11
+lots, mixing multi-timepoint stability lots with release-only
+single-observation lots). The published two-sided 99%-content /
+95%-confidence tolerance interval at month 12 is <strong>(57.25,
+75.41)</strong>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">head</span>(mbl_appendix_a)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt;   Lot Month  Y</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; 1   A     0 70</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; 2   A     1 71</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; 3   A     3 69</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; 4   A     6 68</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; 5   A     9 66</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; 6   A    12 65</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>fm_mbl <span class="ot">&lt;-</span> lme4<span class="sc">::</span><span class="fu">lmer</span>(Y <span class="sc">~</span> Month <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> Lot), <span class="at">data =</span> mbl_appendix_a)</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="fu">ti_lmm</span>(fm_mbl, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">Month =</span> <span class="dv">12</span>), <span class="at">P =</span> <span class="fl">0.99</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; &lt;lmm_interval&gt; ti  (method = anova-mls, design = random_intercept_fixed_slope)</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt;  Month type estimate    lower    upper level    P     sides singular boundary vg_floored</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt;     12   ti 66.33349 57.25272 75.41425  0.95 0.99 two.sided    FALSE    FALSE         NA</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; diagnostics: df, beta_hat, n_E, U, Vhat_Y, C1, C2  (see attr(., &quot;diagnostics&quot;))</span></span></code></pre></div>
+<p>The dispatcher routes this single-observation design to the
+unweighted lot-mean ANOVA engine (<code>method = &quot;anova-mls&quot;</code>),
+which reproduces the published number.</p>
+</div>
+<div id="oliva-aviles-hauser-2025-gpq" class="section level3">
+<h3>Oliva-Aviles &amp; Hauser (2025) GPQ</h3>
+<p><code>oliva_hauser_dgp</code> is the published Section-5
+data-generating specification. The content variance the GPQ method
+targets at <code>t0 = 20</code> has the closed form
+<strong><code>tau^2 = 8.439</code></strong>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>oliva_hauser_dgp<span class="sc">$</span>tau2_at_t0</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; [1] 8.439388</span></span></code></pre></div>
+<p>The GPQ engine is Monte Carlo: its <code>tau^2</code> estimate
+(<code>tau2_med</code>) is noisy on a single dataset but recovers the
+closed-form value <strong>in expectation</strong>. Simulating 20
+datasets from the published DGP and averaging:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> oliva_hauser_dgp</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>sim_one <span class="ot">&lt;-</span> <span class="cf">function</span>(seed, <span class="at">K =</span> <span class="dv">40</span>) {</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  Lc <span class="ot">&lt;-</span> <span class="fu">chol</span>(<span class="fu">matrix</span>(<span class="fu">c</span>(d<span class="sc">$</span>s2_0, d<span class="sc">$</span>s01, d<span class="sc">$</span>s01, d<span class="sc">$</span>s2_1), <span class="dv">2</span>, <span class="dv">2</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(<span class="fu">seq_len</span>(K), <span class="cf">function</span>(k) {</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>    a <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">crossprod</span>(Lc, <span class="fu">rnorm</span>(<span class="dv">2</span>)))                 <span class="co"># batch random effects</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="at">batch =</span> k, <span class="at">time =</span> d<span class="sc">$</span>times,</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>               <span class="at">y =</span> (d<span class="sc">$</span>beta0 <span class="sc">+</span> a[<span class="dv">1</span>]) <span class="sc">+</span> (d<span class="sc">$</span>beta1 <span class="sc">+</span> a[<span class="dv">2</span>]) <span class="sc">*</span> d<span class="sc">$</span>times <span class="sc">+</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>                   <span class="fu">rnorm</span>(<span class="fu">length</span>(d<span class="sc">$</span>times), <span class="dv">0</span>, <span class="fu">sqrt</span>(d<span class="sc">$</span>s2e)))</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  }))</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>}</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>tau2_med <span class="ot">&lt;-</span> <span class="fu">vapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>, <span class="cf">function</span>(s) {</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">sim_one</span>(s)</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>  g <span class="ot">&lt;-</span> <span class="fu">ti_gpq_raw</span>(x<span class="sc">$</span>y, x<span class="sc">$</span>time, x<span class="sc">$</span>batch, <span class="at">t0 =</span> <span class="dv">20</span>, <span class="at">P =</span> <span class="fl">0.90</span>, <span class="at">level =</span> <span class="fl">0.95</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>                  <span class="at">c_resid =</span> <span class="dv">0</span>, <span class="at">control =</span> <span class="fu">lmm_interval_control</span>(<span class="at">seed =</span> s, <span class="at">M =</span> <span class="dv">2000</span>))</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>  <span class="fu">attr</span>(g, <span class="st">&quot;diagnostics&quot;</span>)<span class="sc">$</span>tau2_med</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>}, <span class="fu">numeric</span>(<span class="dv">1</span>))</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="fu">c</span>(<span class="at">closed_form =</span> d<span class="sc">$</span>tau2_at_t0, <span class="at">mean_gpq_tau2 =</span> <span class="fu">mean</span>(tau2_med))</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt;   closed_form mean_gpq_tau2 </span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt;      8.439388      8.371812</span></span></code></pre></div>
+<p>The mean GPQ <code>tau^2</code> recovers the published
+<code>8.439</code> (the package’s test suite checks both the exact
+closed form and this expectation on CI).</p>
+</div>
+</div>
+<div id="the-engine-scope-map" class="section level2">
+<h2>4. The engine / scope map</h2>
+<p>The engine is chosen from the fitted model’s structure, and can
+differ between the verbs (full mapping in
+<code>vignette(&quot;choosing-an-interval&quot;)</code> and
+<code>?reintervals-models</code>):</p>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model class</th>
+<th>CI / PI</th>
+<th>new-group-mean</th>
+<th>TI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>random intercept, intercept-only one-way
+(<code>y ~ 1 + (1 | g)</code>)</td>
+<td><code>ems-mls</code></td>
+<td><code>anova-mls</code></td>
+<td><code>anova-mls</code> (Hoffman &amp; Kringle 2005)</td>
+</tr>
+<tr class="even">
+<td>random intercept, nested, crossed (with interaction), or one-way
+with covariates</td>
+<td><code>ems-mls</code></td>
+<td><code>ems-mls</code></td>
+<td><code>ems-mls</code></td>
+</tr>
+<tr class="odd">
+<td>random intercept + fixed slope, clean balanced</td>
+<td><code>ems-mls</code></td>
+<td><code>anova-mls</code></td>
+<td><code>ems-mls</code></td>
+</tr>
+<tr class="even">
+<td>random intercept + fixed slope, single-observation / unbalanced</td>
+<td><code>ems-mls</code> (warns if any lot has a single
+observation)</td>
+<td><code>anova-mls</code></td>
+<td><code>anova-mls</code></td>
+</tr>
+<tr class="odd">
+<td>random slope, non-singular, future-observation</td>
+<td><code>reml-mls</code></td>
+<td><code>reml-mls</code></td>
+<td><code>reml-mls</code></td>
+</tr>
+<tr class="even">
+<td>random slope, future-observation, singular fit or TI df
+unavailable</td>
+<td><code>reml-mls</code> (flagged <code>singular</code>)</td>
+<td><code>reml-mls</code> (flagged <code>singular</code>)</td>
+<td><code>gpq</code> (two-sided TI only; one-sided tolerance intervals
+stay on <code>reml-mls</code>)</td>
+</tr>
+<tr class="odd">
+<td>random slope, batch-mean (<code>over = &quot;group_mean&quot;</code>, TI
+only)</td>
+<td>—</td>
+<td>—</td>
+<td><code>gpq</code></td>
+</tr>
+</tbody>
+</table>
+<p>The new-group-mean interval targets the true mean of a new innermost
+cell (a new group, a new B-within-A cell, a new (a, b) cell, or a new
+lot at <code>t0</code>); on fixed-slope and intercept-only one-way
+designs it uses the unweighted lot-mean (Montes) construction.</p>
+<p>Only the tolerance interval is re-routed: on a singular random-slope
+fit the TI moves to <code>gpq</code> while CI, PI, and new-group-mean
+stay on <code>reml-mls</code> (flagged <code>singular</code>), and it
+also moves to <code>gpq</code> at any <code>t0</code> where the closed
+form’s Satterthwaite df for the between-group or residual variance is
+unavailable; on a single-observation / unbalanced fixed-slope design the
+TI moves to <code>anova-mls</code> while CI and PI stay on
+<code>ems-mls</code> (and warn when a lot has a single observation; see
+below). The intercept-only one-way TI uses <code>anova-mls</code>, the
+Hoffman &amp; Kringle (2005) interval, balanced or not.</p>
+<p>On the random-intercept path the confidence interval uses a
+Satterthwaite df, falling back to the SAS-style containment df
+(<code>A - 1</code> one-way or nested, <code>min(A, B) - 1</code>
+crossed) when that is unavailable; Kenward-Roger df are used only on
+request (<code>lmm_interval_control(ci_df = &quot;kenward-roger&quot;)</code>).
+The df source is in <code>attr(., &quot;diagnostics&quot;)$df_method</code>.</p>
+<p><code>method = &quot;auto&quot;</code> (the default) picks the engine in the
+table. Any other value is accepted only if it is in the allowed set for
+that model’s design and interval; anything else is an error. For CI, PI,
+and new-group-mean the allowed engine is the one in the table, so there
+is no alternative. Only the tolerance interval offers a choice: on an
+intercept-only one-way model, <code>&quot;anova-mls&quot;</code> (Hoffman &amp;
+Kringle, the default) and <code>&quot;ems-mls&quot;</code> (Francq et al.) are
+both allowed; on a fixed-slope model, <code>&quot;ems-mls&quot;</code> and
+<code>&quot;anova-mls&quot;</code> are both allowed (forcing
+<code>&quot;ems-mls&quot;</code> on single-observation / unbalanced data takes the
+anti-conservative path, mainly for comparison); on a random-slope model
+with the future-observation target, <code>&quot;reml-mls&quot;</code> and
+<code>&quot;gpq&quot;</code> are both allowed. Every other design (other
+random-intercept models without a fixed slope, and the random-slope
+batch-mean target) has a single allowed TI engine.</p>
+<p><strong>Scope:</strong> general fixed effects for random-intercept
+models; a <strong>single continuous covariate</strong> for random-slope
+models (the stability design).</p>
+<div id="a-warning-you-should-understand" class="section level3">
+<h3>A warning you should understand</h3>
+<p>On a fixed-slope model with single-observation lots, the EMS
+confidence and prediction intervals can be <strong>anti-conservative
+(too narrow)</strong>, because REML precision-weighting down-weights the
+single-observation lots. <code>ci_lmm()</code> and <code>pi_lmm()</code>
+<strong>warn</strong> when at least one lot has a single observation
+(the interval is still returned). Here the warning fires on the MBL
+data:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">ci_lmm</span>(fm_mbl, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">Month =</span> <span class="dv">12</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; Warning: This is a fixed-slope model with single-observation lots; the EMS CI interval</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt; may be anti-conservative (too narrow) on such data, because REML precision-weighting</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; down-weights the single-observation lots. The tolerance and new-group-mean intervals use</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; the unweighted lot-mean (Montes) closed forms on this structure; no validated alternative</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; is currently available for the confidence or prediction interval here.</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; &lt;lmm_interval&gt; ci  (method = ems-mls, design = random_intercept_fixed_slope)</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt;  Month type estimate    lower    upper level  P     sides singular boundary vg_floored</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt;     12   ci 66.25067 64.60075 67.90059  0.95 NA two.sided    FALSE       NA         NA</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; diagnostics: df, df_method  (see attr(., &quot;diagnostics&quot;))</span></span></code></pre></div>
+<p>The <em>tolerance</em> and <em>new-group-mean</em> intervals use the
+unweighted lot-mean (Montes) closed forms on this structure (Section 3)
+and do not warn; no validated alternative is currently available for the
+confidence or prediction interval.</p>
+</div>
+</div>
+<div id="limitations" class="section level2">
+<h2>5. Limitations</h2>
+<ul>
+<li><p><strong>The <code>vg_floored</code> flag is a defensive guard you
+should not normally see.</strong> A valid <code>lmer</code> fit has a
+positive-semidefinite random-effect covariance, so the between-group
+variance <code>V_G(t0) = z0&#39; Sigma z0</code> is non-negative at every
+<code>t0</code>. The floor-and-flag only triggers if a (numerically
+degenerate) fit drives it below zero; in normal use it stays
+<code>FALSE</code>/<code>NA</code>. Do not be alarmed by a guard you
+will not hit.</p></li>
+<li><p><strong><code>V_G</code> is quadratic in the time
+covariate.</strong> Evaluating a slope interval at a <code>t0</code>
+outside the observed time range extrapolates that quadratic; do it
+knowingly. There is no guard or warning for extrapolation.</p></li>
+</ul>
+</div>
+<div id="where-to-go-next" class="section level2">
+<h2>6. Where to go next</h2>
+<ul>
+<li><code>?reintervals</code> — package overview and the engine/scope
+map.</li>
+<li><code>?reintervals-models</code> — the model-class to engine mapping
+and design tags.</li>
+<li><code>?ci_lmm</code> — the full <code>lmm_interval</code> output
+contract (shared by all verbs).</li>
+<li><code>NEWS.md</code> — the change log.</li>
+</ul>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
